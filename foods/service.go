@@ -5,6 +5,7 @@ import "strings"
 type Service interface {
 	CreateFood(input FoodInput) (Food, error)
 	GetFoodAll() ([]Food, error)
+	CreateImageFood(input FoodImageInput, path string) (FoodImage, error)
 }
 
 type service struct {
@@ -42,4 +43,30 @@ func (s *service) GetFoodAll() ([]Food, error) {
 	}
 
 	return allFoods, nil
+}
+
+func (s *service) CreateImageFood(input FoodImageInput, path string) (FoodImage, error) {
+	foodImg := FoodImage{
+		FoodID:    input.FoodID,
+		Path:      path,
+		IsPrimary: false,
+	}
+
+	if input.IsPrimary == true {
+		foodImg.IsPrimary = true
+
+		_, err := s.repository.MarkAllImageIsNonPrimary(input.FoodID)
+
+		if err != nil {
+			return FoodImage{}, err
+		}
+	}
+
+	newImg, err := s.repository.SaveImage(foodImg)
+
+	if err != nil {
+		return newImg, err
+	}
+
+	return newImg, nil
 }

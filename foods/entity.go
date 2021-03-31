@@ -8,7 +8,16 @@ type Food struct {
 	Description string
 	Ingredients string
 	Slug        string
-	// ImageURL    string
+	FoodImages  []FoodImage
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
+type FoodImage struct {
+	ID        int
+	FoodID    int
+	IsPrimary bool
+	Path      string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

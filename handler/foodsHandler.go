@@ -1,9 +1,11 @@
 package handler
 
 import (
+	"fmt"
 	"go-foods/foods"
 	"go-foods/helper"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -15,6 +17,8 @@ type foodsHandler struct {
 func NewFoodHandler(serviceFoods foods.Service) *foodsHandler {
 	return &foodsHandler{serviceFoods}
 }
+
+// Create Food
 
 func (h *foodsHandler) CreateFood(c *gin.Context) {
 	var input foods.FoodInput
@@ -39,6 +43,64 @@ func (h *foodsHandler) CreateFood(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// Create Image Food
+func (h *foodsHandler) UploadImageFood(c *gin.Context) {
+	var input foods.FoodImageInput
+
+	err := c.ShouldBind(&input)
+
+	if err != nil {
+		response := helper.FormatResponse("failed", http.StatusUnprocessableEntity, "error1", helper.FormatError(err))
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	file, err := c.FormFile("img")
+	if err != nil {
+		errMsg := gin.H{
+			"is_uploaded": false,
+			"error":       helper.FormatError(err),
+		}
+		response := helper.FormatResponse("failed", http.StatusUnprocessableEntity, "error2", errMsg)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	dirSaved := fmt.Sprintf("images/%s-%s", time.Now().Format("2006-01-02"), file.Filename)
+
+	err = c.SaveUploadedFile(file, dirSaved)
+
+	if err != nil {
+		errMsg := gin.H{
+			"is_uploaded": false,
+			"error":       helper.FormatError(err),
+		}
+		response := helper.FormatResponse("failed", http.StatusUnprocessableEntity, "error3", errMsg)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	_, err = h.serviceFoods.CreateImageFood(input, dirSaved)
+
+	if err != nil {
+		errMsg := gin.H{
+			"is_uploaded": false,
+			"error":       helper.FormatError(err),
+		}
+		response := helper.FormatResponse("failed", http.StatusUnprocessableEntity, "error4", errMsg)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	data := gin.H{
+		"is_uploaded": true,
+	}
+	response := helper.FormatResponse("success", http.StatusOK, "success create image food", data)
+	c.JSON(http.StatusOK, response)
+
+}
+
+// Get All Foods
 func (h *foodsHandler) GetAllFoods(c *gin.Context) {
 	allFoods, err := h.serviceFoods.GetFoodAll()
 

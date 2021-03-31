@@ -30,6 +30,7 @@ func main() {
 
 	api.POST("/foods", foodsHandler.CreateFood)
 	api.GET("/foods", foodsHandler.GetAllFoods)
+	api.POST("/food-image", foodsHandler.UploadImageFood)
 
 	router.Run()
 }

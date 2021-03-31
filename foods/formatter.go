@@ -24,9 +24,12 @@ func FormatFood(food Food) FoodFormatter {
 		ingredients = append(ingredients, strings.TrimSpace(ingredient))
 	}
 	foodFormat.Ingredients = ingredients
-
 	foodFormat.Slug = food.Slug
 
+	// images URL
+	if len(food.FoodImages) > 0 {
+		foodFormat.ImageURL = food.FoodImages[0].Path
+	}
 	return foodFormat
 }
 

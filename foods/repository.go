@@ -5,6 +5,8 @@ import "gorm.io/gorm"
 type Repository interface {
 	Save(food Food) (Food, error)
 	GetAll() ([]Food, error)
+	SaveImage(foodImage FoodImage) (FoodImage, error)
+	MarkAllImageIsNonPrimary(foodID int) (bool, error)
 }
 
 type repository struct {
@@ -28,11 +30,31 @@ func (r *repository) Save(food Food) (Food, error) {
 func (r *repository) GetAll() ([]Food, error) {
 	var allFood []Food
 
-	err := r.db.Find(&allFood).Error
+	err := r.db.Preload("FoodImages", "is_primary = 1").Find(&allFood).Error
 
 	if err != nil {
 		return allFood, err
 	}
 
 	return allFood, nil
+}
+
+func (r *repository) SaveImage(foodImage FoodImage) (FoodImage, error) {
+	err := r.db.Save(&foodImage).Error
+
+	if err != nil {
+		return foodImage, err
+	}
+
+	return foodImage, nil
+}
+
+func (r *repository) MarkAllImageIsNonPrimary(foodID int) (bool, error) {
+	err := r.db.Model(&FoodImage{}).Where("food_id = ?", foodID).Update("is_primary", false).Error
+
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
