@@ -52,7 +52,7 @@ func (s *service) CreateImageFood(input FoodImageInput, path string) (FoodImage,
 		IsPrimary: false,
 	}
 
-	if input.IsPrimary == true {
+	if input.IsPrimary {
 		foodImg.IsPrimary = true
 
 		_, err := s.repository.MarkAllImageIsNonPrimary(input.FoodID)
