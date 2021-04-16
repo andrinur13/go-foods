@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"crypto/md5"
 	"fmt"
 	"go-foods/foods"
 	"go-foods/helper"
@@ -66,7 +67,9 @@ func (h *foodsHandler) UploadImageFood(c *gin.Context) {
 		return
 	}
 
-	dirSaved := fmt.Sprintf("images/%s-%s", time.Now().Format("2006-01-02"), file.Filename)
+	fileName := []byte(file.Filename)
+	fileNameHash := fmt.Sprintf("%x", md5.Sum(fileName))
+	dirSaved := fmt.Sprintf("images/%s-%s-%s", time.Now().Format("20060102150405"), fileNameHash, file.Filename)
 
 	err = c.SaveUploadedFile(file, dirSaved)
 
