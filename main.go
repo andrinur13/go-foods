@@ -5,6 +5,7 @@ import (
 	"go-foods/foods"
 	"go-foods/handler"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -21,6 +22,8 @@ func main() {
 	fmt.Println("connected to database")
 
 	router := gin.Default()
+	router.Static("/images", "./images")
+	router.Use(cors.Default())
 	api := router.Group("/api/v1")
 
 	// declare repo, serv, handler
