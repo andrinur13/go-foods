@@ -2,6 +2,7 @@ package handler
 
 import (
 	"crypto/md5"
+	"errors"
 	"fmt"
 	"go-foods/foods"
 	"go-foods/helper"
@@ -130,8 +131,45 @@ func (h *foodsHandler) GetFood(c *gin.Context) {
 	}
 
 	food, err := h.serviceFoods.GetFood(input.FoodID)
+
+	if err != nil {
+		response := helper.FormatResponse("failed", http.StatusUnprocessableEntity, "error", helper.FormatError(err))
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	if food.ID == 0 {
+		response := helper.FormatResponse("failed", http.StatusNotFound, "failed", helper.FormatError(errors.New("food not found!")))
+		c.JSON(http.StatusNotFound, response)
+		return
+	}
+
 	formatter := foods.FormatFood(food)
 	response := helper.FormatResponse("success", http.StatusOK, "success get detail food data", formatter)
+	c.JSON(http.StatusOK, response)
+}
+
+// update food
+func (h *foodsHandler) UpdateFood(c *gin.Context) {
+	var input foods.FoodEdit
+
+	err := c.ShouldBindJSON(&input)
+
+	if err != nil {
+		response := helper.FormatResponse("failed", http.StatusBadRequest, "error", helper.FormatError(err))
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	food, err := h.serviceFoods.UpdateFood(input)
+
+	if err != nil {
+		response := helper.FormatResponse("failed", http.StatusUnprocessableEntity, "error4", helper.FormatError(err))
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	response := helper.FormatResponse("success", http.StatusOK, "success get detail food data", foods.FormatFood(food))
 	c.JSON(http.StatusOK, response)
 }
 

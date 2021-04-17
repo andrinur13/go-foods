@@ -89,7 +89,7 @@ func (r *repository) DeleteFood(foodID int) error {
 
 // update food
 func (r *repository) Update(food Food) (Food, error) {
-	err := r.db.Where("id = ?", int(food.ID)).Save(&food).Error
+	err := r.db.Save(food).Error
 
 	if err != nil {
 		return food, err

@@ -34,6 +34,7 @@ func main() {
 	api.POST("/foods", foodsHandler.CreateFood)
 	api.GET("/foods", foodsHandler.GetAllFoods)
 	api.GET("/food/:id", foodsHandler.GetFood)
+	api.PUT("/food", foodsHandler.UpdateFood)
 	api.DELETE("/foods", foodsHandler.DeleteFood)
 
 	api.POST("/food-image", foodsHandler.UploadImageFood)

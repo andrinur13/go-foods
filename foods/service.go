@@ -1,12 +1,16 @@
 package foods
 
-import "strings"
+import (
+	"errors"
+	"strings"
+)
 
 type Service interface {
 	CreateFood(input FoodInput) (Food, error)
 	GetFoodAll() ([]Food, error)
 	GetFood(foodID int) (Food, error)
 	DeleteFood(foodID int) error
+	UpdateFood(food FoodEdit) (Food, error)
 	CreateImageFood(input FoodImageInput, path string) (FoodImage, error)
 }
 
@@ -81,6 +85,43 @@ func (s *service) CreateImageFood(input FoodImageInput, path string) (FoodImage,
 	}
 
 	return newImg, nil
+}
+
+func (s *service) UpdateFood(food FoodEdit) (Food, error) {
+	// get detail food yang akan diupdate
+	foodUpdate, err := s.repository.GetByID(food.ID)
+
+	if err != nil {
+		return foodUpdate, err
+	}
+
+	if foodUpdate.ID == 0 {
+		return foodUpdate, errors.New("food detail not found!")
+	}
+
+	// mapping dulu
+	if food.Name != "" {
+		foodUpdate.Name = food.Name
+		// slug jg baru
+		foodUpdate.Slug = strings.ReplaceAll(food.Name, " ", "-")
+		foodUpdate.Slug = strings.ToLower(foodUpdate.Slug)
+	}
+
+	if food.Description != "" {
+		foodUpdate.Description = food.Description
+	}
+
+	if food.Ingredients != "" {
+		foodUpdate.Ingredients = food.Ingredients
+	}
+
+	// query ke repo
+	newFoodUpdate, err := s.repository.Update(foodUpdate)
+	if err != nil {
+		return newFoodUpdate, err
+	}
+
+	return newFoodUpdate, nil
 }
 
 func (s *service) DeleteFood(foodID int) error {

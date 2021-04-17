@@ -14,6 +14,13 @@ type FoodDetail struct {
 	FoodID int `uri:"id" binding:"required"`
 }
 
+type FoodEdit struct {
+	ID          int    `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Ingredients string `json:"ingredients"`
+}
+
 type FoodImageInput struct {
 	FoodID    int  `form:"food_id" binding:"required"`
 	IsPrimary bool `form:"is_primary"`
