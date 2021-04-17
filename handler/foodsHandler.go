@@ -117,9 +117,27 @@ func (h *foodsHandler) GetAllFoods(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// Get Food by ID
+func (h *foodsHandler) GetFood(c *gin.Context) {
+	var input foods.FoodDetail
+
+	err := c.ShouldBindUri(&input)
+
+	if err != nil {
+		response := helper.FormatResponse("failed", http.StatusBadRequest, "error", helper.FormatError(err))
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	food, err := h.serviceFoods.GetFood(input.FoodID)
+	formatter := foods.FormatFood(food)
+	response := helper.FormatResponse("success", http.StatusOK, "success get detail food data", formatter)
+	c.JSON(http.StatusOK, response)
+}
+
 // Delete foods
 func (h *foodsHandler) DeleteFood(c *gin.Context) {
-	var input foods.FoodDeleteInput
+	var input foods.FoodDeelete
 
 	err := c.ShouldBindJSON(&input)
 
