@@ -4,8 +4,10 @@ import "gorm.io/gorm"
 
 type Repository interface {
 	Save(food Food) (Food, error)
+	GetByID(foodID int) (Food, error)
 	GetAll() ([]Food, error)
 	DeleteFood(foodID int) error
+	Update(food Food) (Food, error)
 	SaveImage(foodImage FoodImage) (FoodImage, error)
 	MarkAllImageIsNonPrimary(foodID int) (bool, error)
 }
@@ -60,6 +62,20 @@ func (r *repository) MarkAllImageIsNonPrimary(foodID int) (bool, error) {
 	return true, nil
 }
 
+// Get food by id
+func (r *repository) GetByID(foodID int) (Food, error) {
+	food := Food{}
+
+	err := r.db.Where("id = ?", foodID).Find(&food).Error
+
+	if err != nil {
+		return food, err
+	}
+
+	return food, nil
+}
+
+// Delete
 func (r *repository) DeleteFood(foodID int) error {
 	foodDeleted := Food{}
 	err := r.db.Where("id = ?", foodID).Delete(foodDeleted).Error
@@ -69,4 +85,15 @@ func (r *repository) DeleteFood(foodID int) error {
 	}
 
 	return nil
+}
+
+// update food
+func (r *repository) Update(food Food) (Food, error) {
+	err := r.db.Where("id = ?", int(food.ID)).Save(&food).Error
+
+	if err != nil {
+		return food, err
+	}
+
+	return food, nil
 }
