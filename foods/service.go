@@ -5,6 +5,7 @@ import "strings"
 type Service interface {
 	CreateFood(input FoodInput) (Food, error)
 	GetFoodAll() ([]Food, error)
+	DeleteFood(foodID int) error
 	CreateImageFood(input FoodImageInput, path string) (FoodImage, error)
 }
 
@@ -69,4 +70,14 @@ func (s *service) CreateImageFood(input FoodImageInput, path string) (FoodImage,
 	}
 
 	return newImg, nil
+}
+
+func (s *service) DeleteFood(foodID int) error {
+	err := s.repository.DeleteFood(foodID)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

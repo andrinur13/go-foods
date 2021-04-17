@@ -20,7 +20,6 @@ func NewFoodHandler(serviceFoods foods.Service) *foodsHandler {
 }
 
 // Create Food
-
 func (h *foodsHandler) CreateFood(c *gin.Context) {
 	var input foods.FoodInput
 
@@ -116,4 +115,29 @@ func (h *foodsHandler) GetAllFoods(c *gin.Context) {
 	formatter := foods.FormatFoods(allFoods)
 	response := helper.FormatResponse("success", http.StatusOK, "success get all foods data", formatter)
 	c.JSON(http.StatusOK, response)
+}
+
+// Delete foods
+func (h *foodsHandler) DeleteFood(c *gin.Context) {
+	var input foods.FoodDeleteInput
+
+	err := c.ShouldBindJSON(&input)
+
+	if err != nil {
+		response := helper.FormatResponse("failed", http.StatusUnprocessableEntity, "error", helper.FormatError(err))
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	err = h.serviceFoods.DeleteFood(int(input.FoodID))
+
+	if err != nil {
+		response := helper.FormatResponse("failed", http.StatusUnprocessableEntity, "error", helper.FormatError(err))
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	response := helper.FormatResponse("success", http.StatusOK, "success", nil)
+	c.JSON(http.StatusOK, response)
+	return
 }

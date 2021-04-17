@@ -33,6 +33,7 @@ func main() {
 
 	api.POST("/foods", foodsHandler.CreateFood)
 	api.GET("/foods", foodsHandler.GetAllFoods)
+	api.DELETE("/foods", foodsHandler.DeleteFood)
 	api.POST("/food-image", foodsHandler.UploadImageFood)
 
 	router.Run()

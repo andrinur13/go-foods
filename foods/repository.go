@@ -5,6 +5,7 @@ import "gorm.io/gorm"
 type Repository interface {
 	Save(food Food) (Food, error)
 	GetAll() ([]Food, error)
+	DeleteFood(foodID int) error
 	SaveImage(foodImage FoodImage) (FoodImage, error)
 	MarkAllImageIsNonPrimary(foodID int) (bool, error)
 }
@@ -57,4 +58,15 @@ func (r *repository) MarkAllImageIsNonPrimary(foodID int) (bool, error) {
 	}
 
 	return true, nil
+}
+
+func (r *repository) DeleteFood(foodID int) error {
+	foodDeleted := Food{}
+	err := r.db.Where("id = ?", foodID).Delete(foodDeleted).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
